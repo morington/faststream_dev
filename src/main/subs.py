@@ -10,7 +10,7 @@ from faststream.nats.annotations import NatsMessage
 from faststream import ContextRepo
 
 from src.infrastructure.logger.loggers import InitLoggers
-from src.main.di import ConfigProvider#, t_config
+# from src.main.di import ConfigProvider#, t_config
 
 logger = structlog.getLogger(InitLoggers.main.name)
 router = NatsRouter()
@@ -28,13 +28,13 @@ router = NatsRouter()
     kv_watch=KvWatch(bucket="miniapp")
 )
 @inject
-async def miniapp_sub(new_value: int, config: FromDishka[dict]):
+async def miniapp_sub(new_value: int, config: FromDishka[ContextRepo]):
     await logger.ainfo(new_value, t_config=type(config), c=config)
-    config["result"] = new_value
+    config.set_global("result", new_value)
 
 ##########
 async def miniapp(container: AsyncContainer):
-    config = await container.get(dict)
+    config = await container.get(ContextRepo)
 
     while True:
         await asyncio.sleep(1)
@@ -42,7 +42,7 @@ async def miniapp(container: AsyncContainer):
 ##########
 
 async def main() -> None:
-    container = make_async_container(FastStreamProvider(), ConfigProvider())
+    container = make_async_container(FastStreamProvider())
 
     broker = NatsBroker(
         servers=["nats://127.0.0.1:30114"]
