@@ -23,6 +23,17 @@ async def main() -> None:
         subject="test"
     )
 
+    #p = broker.publisher(subject="test2")
+
+    # @broker.publisher(subject="test2")
+    # async def r() -> str:
+    #     result = str(2*2)
+    #     await logger.ainfo(result)
+    #     return result
+    #     # await p.publish(result)
+    #
+    # await r()
+
 
 if __name__ == "__main__":
     InitLoggers()
